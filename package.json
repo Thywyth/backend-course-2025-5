@@ -1,0 +1,16 @@
+{
+  "name": "primitive-http-proxy",
+  "version": "1.0.0",
+  "description": "A simple caching HTTP proxy for lab exercise",
+  "main": "proxy.js",
+  "scripts": {
+    "start": "node proxy.js",
+    "start:origin": "node origin.js",
+    "test": "node test/test_proxy.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=12"
+  }
+}
