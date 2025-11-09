@@ -4,7 +4,7 @@
   "description": "A simple caching HTTP proxy for lab exercise",
   "main": "proxy.js",
   "scripts": {
-    "start": "node proxy.js",
+    "start": "nodemon -L proxy.js",
     "start:origin": "node origin.js",
     "test": "node test/test_proxy.js"
   },
@@ -12,5 +12,24 @@
   "license": "MIT",
   "engines": {
     "node": ">=12"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thywyth/backend-course-2025-5.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/Thywyth/backend-course-2025-5/issues"
+  },
+  "homepage": "https://github.com/Thywyth/backend-course-2025-5#readme",
+  "dependencies": {
+    "commander": "^14.0.2",
+    "superagent": "^10.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
