@@ -27,8 +27,47 @@ if (!fs.existsSync(CACHE_DIR)) {
 }
 
 const server = http.createServer(async (req, res) => {
-  res.writeHead(501);
-  res.end('Server is running, but method not implemented.');
+
+  const httpCode = req.url.slice(1);
+  if (!httpCode || !/^\d+$/.test(httpCode)) {
+    res.writeHead(400);
+    res.end('Invalid HTTP status code in URL');
+    return;
+  }
+
+  const filePath = path.join(CACHE_DIR, `${httpCode}.jpeg`);
+
+  switch (req.method) {
+
+    case 'GET':
+      try {
+        const data = await fsPromises.readFile(filePath);
+
+        res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+        res.end(data);
+
+      } catch (err) {
+        res.writeHead(404);
+        res.end('Not Found in cache');
+      }
+      break;
+
+    case 'DELETE':
+      try {
+        await fsPromises.unlink(filePath);
+        res.writeHead(200);
+        res.end('OK, deleted from cache');
+      } catch (err) {
+        res.writeHead(404);
+        res.end('Not Found in cache');
+      }
+      break;
+
+    default:
+      res.writeHead(405);
+      res.end('Method Not Allowed');
+      break;
+  }
 });
 
 server.listen(options.port, options.host, () => {
