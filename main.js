@@ -38,21 +38,54 @@ const server = http.createServer(async (req, res) => {
   const filePath = path.join(CACHE_DIR, `${httpCode}.jpeg`);
 
   switch (req.method) {
-
     case 'GET':
       try {
         const data = await fsPromises.readFile(filePath);
 
+        console.log(`[CACHE HIT] Serving ${httpCode}.jpeg from cache`);
         res.writeHead(200, { 'Content-Type': 'image/jpeg' });
         res.end(data);
 
       } catch (err) {
-        res.writeHead(404);
-        res.end('Not Found in cache');
+        console.log(`[CACHE MISS] ${httpCode}.jpeg not found. Fetching from http.cat...`);
+
+        try {
+          const response = await superagent.get(`https://http.cat/${httpCode}`);
+
+          await fsPromises.writeFile(filePath, response.body);
+          console.log(`[CACHE WRITE] Saved ${httpCode}.jpeg to cache`);
+
+          res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+          res.end(response.body);
+
+        } catch (proxyErr) {
+          console.error(`[PROXY FAIL] Failed to fetch ${httpCode} from http.cat`);
+          res.writeHead(proxyErr.status || 500);
+          res.end(`Failed to fetch image. Origin server responded with: ${proxyErr.status}`);
+        }
       }
       break;
 
-    case 'DELETE':
+    case 'PUT':
+      try {
+        const chunks = [];
+        req.on('data', chunk => chunks.push(chunk));
+
+        req.on('end', async () => {
+          const body = Buffer.concat(chunks);
+
+          await fsPromises.writeFile(filePath, body);
+
+          res.writeHead(201);
+          res.end('Created/Updated in cache');
+        });
+
+      } catch (err) {
+        res.writeHead(500);
+        res.end('Server error while writing to cache');
+      }
+      break;
+      case 'DELETE':
       try {
         await fsPromises.unlink(filePath);
         res.writeHead(200);
