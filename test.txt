@@ -1,0 +1,6 @@
+curl -v http://localhost:8080/200 -o 200_from_cat.jpeg
+curl -v http://localhost:8080/200 -o 200_from_cache.jpeg
+curl -v -X PUT --data-binary "@test.jpg" http://localhost:8080/999
+curl -v -X DELETE http://localhost:8080/999
+curl -v http://localhost:8080/999
+curl -v -X POST http://localhost:8080/418
